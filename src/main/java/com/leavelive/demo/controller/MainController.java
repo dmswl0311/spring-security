@@ -1,12 +1,17 @@
 package com.leavelive.demo.controller;
 
+import com.leavelive.demo.auth.PrincipalDetails;
 import com.leavelive.demo.domain.Role;
 import com.leavelive.demo.domain.User;
 import com.leavelive.demo.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,6 +23,31 @@ public class MainController {
     UserRepository repo;
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    @GetMapping("/test/login")
+    //DI(의존성 주입)
+    public @ResponseBody String testLogin(Authentication authentication, @AuthenticationPrincipal PrincipalDetails userDetails){
+        // 유저 찾는 방법 2가지
+//        System.out.println("/test/login :: "+authentication.getPrincipal());
+//        PrincipalDetails principalDetails=(PrincipalDetails) authentication.getPrincipal();
+//        System.out.println("authentication :: "+principalDetails.getUser());
+
+        System.out.println("username ::"+userDetails.getUser());
+
+        return "세션 정보 확인";
+    }
+
+    @GetMapping("/test/oauth/login")
+    public @ResponseBody String testOauthLogin(Authentication authentication,@AuthenticationPrincipal OAuth2User oauth){
+        // 유저 찾는 방법 2가지
+//        System.out.println("/test/login :: "+authentication.getPrincipal());
+//        OAuth2User oAuth2User=(OAuth2User) authentication.getPrincipal();
+//        System.out.println("authentication :: "+oAuth2User.getAttributes());
+
+        System.out.println("oauth2User :: "+oauth.getAttributes());
+
+        return "OAuth 세션 정보 확인";
+    }
 
     @GetMapping("/")
     public String index(){
@@ -43,7 +73,8 @@ public class MainController {
         return "redirect:/loginForm";
     }
     @GetMapping("/user")
-    public @ResponseBody String user(){
+    public @ResponseBody String user(@AuthenticationPrincipal PrincipalDetails principalDetails){
+        System.out.println("principalDetails"+principalDetails.getUser());
         return "user";
     }
     @GetMapping("/admin")

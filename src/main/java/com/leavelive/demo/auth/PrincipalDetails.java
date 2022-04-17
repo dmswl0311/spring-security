@@ -8,23 +8,34 @@ package com.leavelive.demo.auth;
 
 import com.leavelive.demo.domain.Role;
 import com.leavelive.demo.domain.User;
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 
 // 시큐리티가 가지고 있는 세션(Security Session) -> Authentication 객체 -> UserDetails 객체
-public class PrincipalDetails implements UserDetails {
+@Getter
+public class PrincipalDetails implements UserDetails, OAuth2User {
 
     private User user; //콤포지션
+    private Map<String,Object> attributes;
 
+    // 일반 로그인
     public PrincipalDetails(User user){
         this.user=user;
     }
-    
+    // OAuth 로그인
+    public PrincipalDetails(User user,Map<String,Object> attributes){
+        this.user=user;
+        this.attributes=attributes;
+    }
+
     // 해당 유저의 권한을 리턴하는 곳
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -68,5 +79,15 @@ public class PrincipalDetails implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    @Override
+    public Map<String, Object> getAttributes() {
+        return attributes;
+    }
+
+    @Override
+    public String getName() {
+        return null;
     }
 }

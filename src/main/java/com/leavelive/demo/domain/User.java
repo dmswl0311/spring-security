@@ -25,4 +25,7 @@ public class User {
     @Column(length = 30)
     private String nickname;
 
+    private String provider;
+    private String providerId;
+
 }
